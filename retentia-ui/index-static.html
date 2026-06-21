@@ -99,13 +99,13 @@ select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 
     </div>
     <nav class="menu">
       <a class="active"><i class="fa fa-chart-line fa-fw"></i> Nova Predição</a>
-      <a onclick="window.open('http://retentia.vitorsilva.engineer/docs','_blank')"><i class="fa fa-code fa-fw"></i> Swagger UI</a>
-      <a onclick="window.open('http://retentia.vitorsilva.engineer/metrics','_blank')"><i class="fa fa-gauge fa-fw"></i> Prometheus</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/docs','_blank')"><i class="fa fa-code fa-fw"></i> Documentação da API</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/metrics','_blank')"><i class="fa fa-gauge fa-fw"></i> Métricas</a>
       <a onclick="window.open('https://github.com/vdfs89/RetentIA','_blank')"><i class="fa-brands fa-github fa-fw"></i> GitHub</a>
-      <a onclick="window.open('http://retentia.vitorsilva.engineer/health','_blank')"><i class="fa fa-heart-pulse fa-fw"></i> Health Check</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/health','_blank')"><i class="fa fa-heart-pulse fa-fw"></i> Saúde da API</a>
     </nav>
     <div class="sidebar-footer">
-      <div class="sf-row"><span>API Status</span><span class="sf-val online" id="api-status">● Verificando...</span></div>
+      <div class="sf-row"><span>Status da API</span><span class="sf-val online" id="api-status">● Verificando...</span></div>
       <div class="sf-row"><span>Versão</span><span class="sf-val">v1.0.0</span></div>
       <div class="sf-row"><span>Ambiente</span><span class="sf-val">Produção</span></div>
       <div class="sf-row"><span>Modelo</span><span class="sf-val">MLP • v1.0</span></div>
@@ -121,8 +121,8 @@ select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 
       <div class="section">
         <div class="section-title"><i class="fa fa-user"></i> Perfil</div>
         <div class="fields">
-          <div><label>Gênero</label><select id="gender"><option value="Female">Female</option><option value="Male">Male</option></select></div>
-          <div><label>Idoso (Senior Citizen)</label><select id="SeniorCitizen"><option value="0">Não</option><option value="1">Sim</option></select></div>
+          <div><label>Gênero</label><select id="gender"><option value="Female">Feminino</option><option value="Male">Masculino</option></select></div>
+          <div><label>Idoso</label><select id="SeniorCitizen"><option value="0">Não</option><option value="1">Sim</option></select></div>
           <div><label>Possui Parceiro</label><select id="Partner"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
           <div><label>Possui Dependentes</label><select id="Dependents"><option value="No">Não</option><option value="Yes">Sim</option></select></div>
         </div>
@@ -131,9 +131,9 @@ select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 
       <div class="section">
         <div class="section-title"><i class="fa fa-file-contract"></i> Contrato</div>
         <div class="fields">
-          <div><label>Tipo de Contrato</label><select id="Contract"><option value="Month-to-month">Month-to-month</option><option value="One year">One year</option><option value="Two year">Two year</option></select></div>
+          <div><label>Tipo de Contrato</label><select id="Contract"><option value="Month-to-month">Mensal</option><option value="One year">Anual (1 ano)</option><option value="Two year">Bienal (2 anos)</option></select></div>
           <div><label>Fatura Digital</label><select id="PaperlessBilling"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
-          <div><label>Forma de Pagamento</label><select id="PaymentMethod"><option value="Electronic check">Electronic check</option><option value="Mailed check">Mailed check</option><option value="Bank transfer (automatic)">Bank transfer (auto)</option><option value="Credit card (automatic)">Credit card (auto)</option></select></div>
+          <div><label>Forma de Pagamento</label><select id="PaymentMethod"><option value="Electronic check">Cheque eletrônico</option><option value="Mailed check">Cheque postal</option><option value="Bank transfer (automatic)">Transferência bancária (auto)</option><option value="Credit card (automatic)">Cartão de crédito (auto)</option></select></div>
           <div><label>Tempo de Contrato (meses)</label><input type="number" id="tenure" value="12" min="0" max="100"></div>
         </div>
       </div>
@@ -194,7 +194,7 @@ select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 
             <text id="gauge-text" x="100" y="98" text-anchor="middle" fill="white" font-size="32" font-weight="800">–</text>
           </svg>
         </div>
-        <div class="gauge-sub" id="gauge-sub">probabilidade de churn</div>
+        <div class="gauge-sub" id="gauge-sub">probabilidade de cancelamento</div>
 
         <div class="verdict" id="verdict">
           <div class="verdict-icon" id="v-icon"></div>
@@ -215,7 +215,7 @@ select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 
           </div>
           <div class="metric">
             <div class="metric-icon" style="color:var(--purple)">⚖</div>
-            <div class="metric-title">Threshold</div>
+            <div class="metric-title">Limiar</div>
             <div class="metric-value">37%</div>
           </div>
           <div class="metric">
@@ -248,9 +248,9 @@ function v(id) { return document.getElementById(id).value; }
 // Heuristic risk factors (based on EDA findings)
 function getRiskFactors(payload, isChurn) {
   const factors = [];
-  if (payload.Contract === "Month-to-month") factors.push({ text: "Contrato mês-a-mês (churn rate ~42%)", color: "#ef4444" });
-  if (payload.PaymentMethod === "Electronic check") factors.push({ text: "Pagamento via Electronic check (churn rate ~45%)", color: "#f59e0b" });
-  if (payload.InternetService === "Fiber optic") factors.push({ text: "Serviço de internet: Fibra Óptica (churn rate ~42%)", color: "#f59e0b" });
+  if (payload.Contract === "Month-to-month") factors.push({ text: "Contrato mensal (taxa de cancelamento ~42%)", color: "#ef4444" });
+  if (payload.PaymentMethod === "Electronic check") factors.push({ text: "Pagamento via cheque eletrônico (taxa ~45%)", color: "#f59e0b" });
+  if (payload.InternetService === "Fiber optic") factors.push({ text: "Internet: Fibra Óptica (taxa de cancelamento ~42%)", color: "#f59e0b" });
   if (payload.tenure <= 6) factors.push({ text: `Tempo de contrato: ${payload.tenure} meses (primeiros 6m = alto risco)`, color: "#ef4444" });
   else if (payload.tenure <= 12) factors.push({ text: `Tempo de contrato: ${payload.tenure} meses`, color: "#f59e0b" });
   if (payload.OnlineSecurity === "No") factors.push({ text: "Sem segurança online contratada", color: "#94a3b8" });
@@ -328,7 +328,7 @@ function showResult(data, payload) {
   // Metrics
   document.getElementById("d-prob").textContent = `${prob}%`;
   document.getElementById("d-prob").style.color = color;
-  document.getElementById("d-dec").textContent = isChurn ? "Churn" : "Retido";
+  document.getElementById("d-dec").textContent = isChurn ? "Cancelamento" : "Retido";
   document.getElementById("d-dec").style.color = isChurn ? "#fca5a5" : "#6ee7b7";
 
   // Risk factors
