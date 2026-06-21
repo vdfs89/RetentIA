@@ -5,8 +5,6 @@ __pycache__/
 .pytest_cache/
 mlruns/
 mlflow.db
-models/*.pkl
-models/*.pt
 logs/input_samples.jsonl
 data/raw/*.csv
 data/processed/*
