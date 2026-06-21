@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetentIA — Predição de Churn</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
+  header { border-bottom: 1px solid #1e293b; padding: 20px 32px; display: flex; align-items: center; gap: 12px; }
+  .logo { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #06b6d4, #7c3aed); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 700; }
+  .logo-text h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo-text p { font-size: 12px; color: #64748b; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  .grid.has-result { grid-template-columns: 1fr 300px; }
+  .group { margin-bottom: 28px; }
+  .group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: #06b6d4; text-transform: uppercase; margin-bottom: 12px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+  select, input[type=number] { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: #f8fafc; font-size: 13px; }
+  button { width: 100%; padding: 14px; border-radius: 8px; border: none; background: linear-gradient(135deg, #06b6d4, #7c3aed); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+  button:disabled { background: #334155; cursor: not-allowed; }
+  .error { margin-top: 12px; padding: 12px 16px; background: #450a0a; border: 1px solid #7f1d1d; border-radius: 8px; color: #fca5a5; font-size: 13px; }
+  .result-panel { position: sticky; top: 24px; align-self: start; background: #1e293b; border-radius: 12px; padding: 24px; }
+  .result-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .gauge-label { font-size: 13px; color: #94a3b8; margin-top: -8px; text-align: center; }
+  .verdict { padding: 12px 16px; border-radius: 8px; text-align: center; margin-bottom: 16px; }
+  .verdict-icon { font-size: 22px; }
+  .verdict-title { font-weight: 700; font-size: 15px; margin-top: 4px; }
+  .verdict-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+  .detail-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .detail-key { color: #64748b; }
+  .detail-val { color: #f8fafc; font-weight: 500; }
+  .note { margin-top: 14px; padding: 10px 12px; background: #0f172a; border-radius: 6px; font-size: 11px; color: #475569; }
+  #result-container { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <div class="logo-text">
+    <h1>RetentIA</h1>
+    <p>Predição de Churn em Tempo Real</p>
+  </div>
+</header>
+
+<main>
+  <div class="grid" id="main-grid">
+    <div id="form-col">
+
+      <div class="group">
+        <div class="group-label">Perfil</div>
+        <div class="fields">
+          <div><label>Gênero</label>
+            <select id="gender"><option value="Female">Female</option><option value="Male">Male</option></select></div>
+          <div><label>Idoso</label>
+            <select id="SeniorCitizen"><option value="0">Não</option><option value="1">Sim</option></select></div>
+          <div><label>Parceiro(a)</label>
+            <select id="Partner"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Dependentes</label>
+            <select id="Dependents"><option value="No">Não</option><option value="Yes">Sim</option></select></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Contrato</div>
+        <div class="fields">
+          <div><label>Tipo de Contrato</label>
+            <select id="Contract"><option value="Month-to-month">Month-to-month</option><option value="One year">One year</option><option value="Two year">Two year</option></select></div>
+          <div><label>Fatura Digital</label>
+            <select id="PaperlessBilling"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Pagamento</label>
+            <select id="PaymentMethod">
+              <option value="Electronic check">Electronic check</option>
+              <option value="Mailed check">Mailed check</option>
+              <option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+              <option value="Credit card (automatic)">Credit card (automatic)</option>
+            </select></div>
+          <div><label>Tempo de Contrato (meses)</label>
+            <input type="number" id="tenure" value="12" min="0" max="100"></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Serviços</div>
+        <div class="fields">
+          <div><label>Telefone</label>
+            <select id="PhoneService"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Múltiplas Linhas</label>
+            <select id="MultipleLines"><option value="No">Não</option><option value="Yes">Sim</option><option value="No phone service">Sem telefone</option></select></div>
+          <div><label>Internet</label>
+            <select id="InternetService"><option value="Fiber optic">Fibra Óptica</option><option value="DSL">DSL</option><option value="No">Não</option></select></div>
+          <div><label>Segurança Online</label>
+            <select id="OnlineSecurity"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Backup Online</label>
+            <select id="OnlineBackup"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Proteção de Dispositivo</label>
+            <select id="DeviceProtection"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Suporte Técnico</label>
+            <select id="TechSupport"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Streaming TV</label>
+            <select id="StreamingTV"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Streaming Filmes</label>
+            <select id="StreamingMovies"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Cobrança</div>
+        <div class="fields">
+          <div><label>Cobrança Mensal (R$)</label>
+            <input type="number" id="MonthlyCharges" value="70.35" step="0.01" min="0"></div>
+          <div><label>Cobrança Total (R$)</label>
+            <input type="number" id="TotalCharges" value="845.5" step="0.01" min="0"></div>
+        </div>
+      </div>
+
+      <button id="btn" onclick="predict()">Analisar Risco de Churn</button>
+      <div class="error" id="error" style="display:none"></div>
+    </div>
+
+    <div id="result-container">
+      <div class="result-panel" id="result-panel">
+        <div class="result-label">Resultado</div>
+        <svg id="gauge" viewBox="0 0 120 70" style="width:100%">
+          <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#1e3a5f" stroke-width="12" stroke-linecap="round"/>
+          <path id="gauge-arc" d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 157"/>
+          <text id="gauge-text" x="60" y="55" text-anchor="middle" fill="#f8fafc" font-size="20" font-weight="700">0%</text>
+        </svg>
+        <div class="gauge-label">probabilidade de churn</div>
+        <div class="verdict" id="verdict" style="margin-top:16px">
+          <div class="verdict-icon" id="verdict-icon"></div>
+          <div class="verdict-title" id="verdict-title"></div>
+          <div class="verdict-sub" id="verdict-sub"></div>
+        </div>
+        <div class="detail-row"><span class="detail-key">Probabilidade</span><span class="detail-val" id="d-prob"></span></div>
+        <div class="detail-row"><span class="detail-key">Threshold</span><span class="detail-val">36% (custo-ótimo)</span></div>
+        <div class="detail-row"><span class="detail-key">Decisão</span><span class="detail-val" id="d-dec"></span></div>
+        <div class="note">C_FN=500 › C_FP=100 → threshold 0.36</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = "http://retentia.vitorsilva.engineer";
+
+async function predict() {
+  const btn = document.getElementById("btn");
+  const errEl = document.getElementById("error");
+  btn.disabled = true;
+  btn.textContent = "Analisando...";
+  errEl.style.display = "none";
+
+  const payload = {
+    gender: val("gender"),
+    SeniorCitizen: parseInt(val("SeniorCitizen")),
+    Partner: val("Partner"),
+    Dependents: val("Dependents"),
+    tenure: parseFloat(val("tenure")),
+    PhoneService: val("PhoneService"),
+    MultipleLines: val("MultipleLines"),
+    InternetService: val("InternetService"),
+    OnlineSecurity: val("OnlineSecurity"),
+    OnlineBackup: val("OnlineBackup"),
+    DeviceProtection: val("DeviceProtection"),
+    TechSupport: val("TechSupport"),
+    StreamingTV: val("StreamingTV"),
+    StreamingMovies: val("StreamingMovies"),
+    Contract: val("Contract"),
+    PaperlessBilling: val("PaperlessBilling"),
+    PaymentMethod: val("PaymentMethod"),
+    MonthlyCharges: parseFloat(val("MonthlyCharges")),
+    TotalCharges: parseFloat(val("TotalCharges")),
+  };
+
+  try {
+    const res = await fetch(`${API}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`API retornou ${res.status}`);
+    const data = await res.json();
+    showResult(data);
+  } catch (e) {
+    errEl.textContent = e.message.includes("fetch")
+      ? "Não foi possível conectar à API. Verifique CORS ou se está online."
+      : `Erro: ${e.message}`;
+    errEl.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Analisar Risco de Churn";
+  }
+}
+
+function val(id) { return document.getElementById(id).value; }
+
+function showResult(data) {
+  const prob = Math.round(data.churn_probability * 100);
+  const isChurn = data.churn_prediction;
+  const color = prob > 70 ? "#ef4444" : prob > 40 ? "#f59e0b" : "#22c55e";
+
+  document.getElementById("gauge-arc").setAttribute("stroke", color);
+  document.getElementById("gauge-arc").setAttribute("stroke-dasharray", `${prob * 1.57} 157`);
+  document.getElementById("gauge-text").textContent = `${prob}%`;
+
+  const verdict = document.getElementById("verdict");
+  verdict.style.background = isChurn ? "#3b0764" : "#052e16";
+  verdict.style.border = `1px solid ${isChurn ? "#7c3aed" : "#166534"}`;
+  document.getElementById("verdict-icon").textContent = isChurn ? "⚠️" : "✅";
+  document.getElementById("verdict-title").textContent = isChurn ? "Alto Risco de Churn" : "Baixo Risco";
+  document.getElementById("verdict-title").style.color = isChurn ? "#c4b5fd" : "#86efac";
+  document.getElementById("verdict-sub").textContent = isChurn
+    ? "Recomenda-se ação de retenção"
+    : "Cliente provavelmente permanece";
+
+  document.getElementById("d-prob").textContent = `${prob}%`;
+  document.getElementById("d-dec").textContent = isChurn ? "Churn" : "Retido";
+
+  document.getElementById("result-container").style.display = "block";
+  document.getElementById("main-grid").classList.add("has-result");
+}
+</script>
+</body>
+</html>
