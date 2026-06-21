@@ -99,6 +99,20 @@ Auto-download na primeira execução do `make train` (mirror: [treselle-systems/
 
 ---
 
+## Análise Exploratória (EDA)
+
+Notebook completo em [notebooks/eda.ipynb](notebooks/eda.ipynb). Principais achados:
+
+| | |
+|---|---|
+| ![Churn Distribution](docs/churn_distribution.png) | ![Numerical Distributions](docs/numerical_distributions.png) |
+| ![Categorical Churn Rates](docs/categorical_churn_rates.png) | ![Correlation Matrix](docs/correlation_matrix.png) |
+| ![Tenure vs Churn](docs/tenure_vs_churn.png) | ![Charges Scatter](docs/charges_scatter.png) |
+
+![All Categorical Churn Rates](docs/all_categorical_churn_rates.png)
+
+---
+
 ## API
 
 | Endpoint   | Método | Descrição                             |
