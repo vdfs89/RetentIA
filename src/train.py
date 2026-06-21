@@ -6,7 +6,15 @@ import numpy as np
 import torch
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -17,13 +25,17 @@ from src.models.mlp import ChurnMLP
 from src.validation.schemas import get_pandera_schema
 
 
-def compute_metrics(y_true: np.ndarray, y_preds: np.ndarray):
-    return {
+def compute_metrics(y_true: np.ndarray, y_preds: np.ndarray, y_probs: np.ndarray | None = None):
+    metrics = {
         "accuracy": accuracy_score(y_true, y_preds),
         "precision": precision_score(y_true, y_preds, zero_division=0),
         "recall": recall_score(y_true, y_preds, zero_division=0),
         "f1": f1_score(y_true, y_preds, zero_division=0),
     }
+    if y_probs is not None:
+        metrics["roc_auc"] = roc_auc_score(y_true, y_probs)
+        metrics["pr_auc"] = average_precision_score(y_true, y_probs)
+    return metrics
 
 
 def train_pipeline():
@@ -61,7 +73,8 @@ def train_pipeline():
         dummy = DummyClassifier(strategy="most_frequent")
         dummy.fit(X_train, y_train)
         dummy_preds = dummy.predict(X_test)
-        dummy_metrics = compute_metrics(y_test, dummy_preds)
+        dummy_probs = dummy.predict_proba(X_test)[:, 1]
+        dummy_metrics = compute_metrics(y_test, dummy_preds, dummy_probs)
         for k, v in dummy_metrics.items():
             mlflow.log_metric(f"dummy_{k}", v)
 
@@ -70,11 +83,29 @@ def train_pipeline():
         lr.fit(X_train, y_train)
         lr_probs = lr.predict_proba(X_test)[:, 1]
         lr_preds = (lr_probs >= 0.5).astype(int)
-        lr_metrics = compute_metrics(y_test, lr_preds)
+        lr_metrics = compute_metrics(y_test, lr_preds, lr_probs)
         for k, v in lr_metrics.items():
             mlflow.log_metric(f"logreg_{k}", v)
 
-        # 3. PyTorch MLP
+        # 3. Baseline: XGBoost
+        scale_pos_weight = (len(y_train) - int(np.sum(y_train))) / max(int(np.sum(y_train)), 1)
+        xgb = XGBClassifier(
+            n_estimators=200,
+            max_depth=4,
+            learning_rate=0.05,
+            scale_pos_weight=scale_pos_weight,
+            random_state=42,
+            eval_metric="logloss",
+            verbosity=0,
+        )
+        xgb.fit(X_train, y_train)
+        xgb_probs = xgb.predict_proba(X_test)[:, 1]
+        xgb_preds = (xgb_probs >= 0.5).astype(int)
+        xgb_metrics = compute_metrics(y_test, xgb_preds, xgb_probs)
+        for k, v in xgb_metrics.items():
+            mlflow.log_metric(f"xgb_{k}", v)
+
+        # 4. PyTorch MLP
         input_dim = X_train.shape[1]
         model = ChurnMLP(input_dim)
 
@@ -141,7 +172,7 @@ def train_pipeline():
             test_probs = torch.sigmoid(test_logits).numpy().squeeze()
 
         mlp_preds = (test_probs >= optimal_t).astype(int)
-        mlp_metrics = compute_metrics(y_test, mlp_preds)
+        mlp_metrics = compute_metrics(y_test, mlp_preds, test_probs)
 
         # Log MLP parameters and metrics
         mlflow.log_param("optimal_threshold", optimal_t)
@@ -160,9 +191,10 @@ def train_pipeline():
 
         print("\n=== Pipeline executed successfully ===")
         print(f"Optimal threshold (tuned on val): {optimal_t:.2f}")
-        print(f"Dummy metrics on test: {dummy_metrics}")
-        print(f"Logistic Regression metrics on test: {lr_metrics}")
-        print(f"MLP metrics on test: {mlp_metrics}")
+        print(f"Dummy    : {dummy_metrics}")
+        print(f"LogReg   : {lr_metrics}")
+        print(f"XGBoost  : {xgb_metrics}")
+        print(f"MLP      : {mlp_metrics}")
 
 
 if __name__ == "__main__":
