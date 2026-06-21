@@ -1,0 +1,27 @@
+name: CICD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements.txt
+          uv pip install --system .[dev]
+      - name: Lint and Format Check
+        run: |
+          ruff check src/ tests/
+          ruff format --check src/ tests/
+      - name: Build Docker Image
+        run: docker build -t retentia-ai:latest .

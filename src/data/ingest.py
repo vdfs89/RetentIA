@@ -23,9 +23,7 @@ def ingest_data(
     blank_mask = df["TotalCharges"] == " "
     tenure_zero_mask = df["tenure"] == 0
     if not blank_mask.equals(tenure_zero_mask):
-        print(
-            "Warning: Blank spaces in TotalCharges do not align perfectly with tenure == 0."
-        )
+        print("Warning: Blank spaces in TotalCharges do not align perfectly with tenure == 0.")
 
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce").fillna(0.0)
 

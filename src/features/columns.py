@@ -1,11 +1,22 @@
 NUMERICAL_FEATURES = ["tenure", "MonthlyCharges", "TotalCharges"]
 
 CATEGORICAL_FEATURES = [
-    "gender", "SeniorCitizen", "Partner", "Dependents",
-    "PhoneService", "MultipleLines", "InternetService",
-    "OnlineSecurity", "OnlineBackup", "DeviceProtection",
-    "TechSupport", "StreamingTV", "StreamingMovies",
-    "Contract", "PaperlessBilling", "PaymentMethod",
+    "gender",
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
 ]
 
 TARGET_COLUMN = "Churn"
