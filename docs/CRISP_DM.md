@@ -21,23 +21,25 @@ Churn erodes recurring revenue. A telecom loses not just the current month's bil
 
 ## Phase 4 — Modeling
 
-Three models trained and compared:
+Four models trained and compared:
 
 1. **DummyClassifier** (most_frequent): Baseline — always predicts majority class.
 2. **LogisticRegression** (class_weight=balanced, max_iter=1000): Strong linear baseline.
-3. **MLP** (PyTorch): [32→16→1], BatchNorm + ReLU + Dropout(0.2), BCEWithLogitsLoss with pos_weight=2.73, Adam lr=0.005, batch_size=64, early stopping at epoch 19 (patience=10).
+3. **XGBClassifier** (n_estimators=200, max_depth=4, lr=0.05, scale_pos_weight=2.73): Gradient boosting baseline.
+4. **MLP** (PyTorch): [32→16→1], BatchNorm + ReLU + Dropout(0.2), BCEWithLogitsLoss with pos_weight=2.73, Adam lr=0.005, batch_size=64, early stopping at epoch 14 (patience=10).
 
 ## Phase 5 — Evaluation
 
-| Model         | Accuracy | Precision | Recall | F1     |
-|---------------|----------|-----------|--------|--------|
-| Dummy         | 0.7346   | 0.0000    | 0.0000 | 0.0000 |
-| LogReg @0.5   | 0.7381   | 0.5043    | 0.7807 | 0.6128 |
-| MLP @0.36     | 0.6558   | 0.4295    | 0.9037 | 0.5823 |
+| Modelo         | Accuracy | Precision | Recall | F1     | ROC-AUC | PR-AUC |
+|----------------|----------|-----------|--------|--------|---------|--------|
+| Dummy          | 0.7346   | 0.0000    | 0.0000 | 0.0000 | 0.5000  | 0.2654 |
+| LogReg @0.5    | 0.7381   | 0.5043    | 0.7807 | 0.6128 | 0.8429  | 0.6340 |
+| XGBoost @0.5   | 0.7480   | 0.5167    | 0.7861 | 0.6236 | 0.8420  | 0.6534 |
+| MLP @0.37      | 0.6828   | 0.4510    | 0.8984 | 0.6005 | 0.8453  | 0.6372 |
 
-**Cost-sensitive threshold:** 0.36 (tuned on validation set). With C_FN=500 and C_FP=100, the optimal operating point favors recall (catching churners) over precision (avoiding false alarms). The MLP captures 90.4% of actual churners.
-
-**Honest assessment:** The MLP does not outperform LogReg on F1 or accuracy. The comparison is not fully apples-to-apples (LogReg at 0.5 vs MLP at 0.36). The primary contribution is the cost-sensitive threshold, not the model architecture. See MODEL_CARD.md for detailed analysis.
+ROC-AUC plateau at ~0.842–0.845 across all non-dummy models. XGBoost leads on F1/PR-AUC at
+default threshold. MLP @0.37 leads on recall via cost-sensitive threshold (C_FN=500, C_FP=100).
+Honest finding: architecture does not drive performance on this dataset — features do.
 
 ## Phase 6 — Deployment
 

@@ -16,15 +16,16 @@ Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de
 
 ## Resultados
 
-| Modelo        | Accuracy | Precision | Recall   | F1     |
-|---------------|----------|-----------|----------|--------|
-| Dummy         | 0.7346   | 0.0000    | 0.0000   | 0.0000 |
-| LogReg @0.5   | 0.7381   | 0.5043    | 0.7807   | 0.6128 |
-| **MLP @0.36** | 0.6558   | 0.4295    | **0.9037** | 0.5823 |
+| Modelo         | Accuracy | Precision | Recall   | F1     | ROC-AUC | PR-AUC |
+|----------------|----------|-----------|----------|--------|---------|--------|
+| Dummy          | 0.7346   | 0.0000    | 0.0000   | 0.0000 | 0.5000  | 0.2654 |
+| LogReg @0.5    | 0.7381   | 0.5043    | 0.7807   | 0.6128 | 0.8429  | 0.6340 |
+| XGBoost @0.5   | 0.7480   | 0.5167    | 0.7861   | **0.6236** | 0.8420 | **0.6534** |
+| **MLP @0.37**  | 0.6828   | 0.4510    | **0.8984** | 0.6005 | **0.8453** | 0.6372 |
 
-**Threshold otimizado por custo: 0.36** — tunado no conjunto de validação (C_FN=500, C_FP=100).
+**Cost-optimized threshold: 0.37** (tuned on validation set, C_FN=500, C_FP=100).
 
-O MLP captura **90% dos churners reais**, trocando accuracy por recall. Quando perder um cliente custa 5× mais que uma oferta de retenção desperdiçada, esse é o tradeoff correto. O MLP não supera a LogReg em F1 — e isso é documentado honestamente. A contribuição é o **threshold derivado por custo**, não a arquitetura. Ver [MODEL_CARD](docs/MODEL_CARD.md).
+ROC-AUC é quase idêntico nos três modelos (~0.842–0.845) — o sinal vem das features, não da arquitetura. O XGBoost lidera em F1 e PR-AUC @0.5. O MLP captura **90% dos churners reais** operando no threshold por custo. Análise honesta: o MLP não supera o XGBoost em F1 — a contribuição é o **framework de threshold sensível a custo**. Ver [MODEL_CARD](docs/MODEL_CARD.md).
 
 ---
 
