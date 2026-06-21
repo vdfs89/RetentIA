@@ -1,6 +1,7 @@
 import time
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Histogram
 
 from src.routes.metrics import router as metrics_router
@@ -13,6 +14,13 @@ LATENCY = Histogram(
 )
 
 app = FastAPI(title="RetentIA API", description="FastAPI Churn Prediction Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.middleware("http")
