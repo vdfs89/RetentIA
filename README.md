@@ -167,9 +167,20 @@ Threshold: **0.36** — derivado por minimização de custo no conjunto de valid
 ## Deploy
 
 - **Infraestrutura:** DigitalOcean Droplet (8GB) + Docker + Nginx reverse proxy
-- **URL:** [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer/docs)
+- **Frontend:** [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer) — UI estática servida pelo Nginx
+- **API / Swagger:** [retentia.vitorsilva.engineer/docs](http://retentia.vitorsilva.engineer/docs)
 - **CI/CD:** GitHub Actions (lint + testes em PR; lint + format + Docker build em push)
 - **Observabilidade:** Header `X-Process-Time`, Prometheus `/metrics`, drift log `logs/input_samples.jsonl`
+
+### Arquitetura de roteamento (Nginx)
+
+```
+retentia.vitorsilva.engineer/           → HTML estático (retentia-ui/index-static.html)
+retentia.vitorsilva.engineer/predict    → FastAPI (proxy → Docker :8000)
+retentia.vitorsilva.engineer/health     → FastAPI
+retentia.vitorsilva.engineer/metrics    → FastAPI (Prometheus)
+retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
+```
 
 ---
 
