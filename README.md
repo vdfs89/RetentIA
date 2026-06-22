@@ -1,3 +1,5 @@
+<div align="center">
+
 <p align="center">
   <img src="docs/retentia-logo.png" alt="RetentIA" width="120">
 </p>
@@ -240,3 +242,5 @@ retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
 ## Licença
 
 MIT
+
+</div>
