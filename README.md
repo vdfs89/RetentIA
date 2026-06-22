@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/retentia-logo.png" alt="RetentIA" width="120">
+</p>
+
 # RetentIA
 
 [![CI](https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml/badge.svg)](https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml)
