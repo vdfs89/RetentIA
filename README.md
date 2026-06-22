@@ -198,7 +198,7 @@ Threshold: **0.36** — derivado por minimização de custo no conjunto de valid
 ### Arquitetura de roteamento (Nginx)
 
 ```
-retentia.vitorsilva.engineer/           → HTML estático (retentia-ui/index-static.html)
+retentia.vitorsilva.engineer/           → HTML estático (index.html)
 retentia.vitorsilva.engineer/predict    → FastAPI (proxy → Docker :8000)
 retentia.vitorsilva.engineer/health     → FastAPI
 retentia.vitorsilva.engineer/metrics    → FastAPI (Prometheus)
