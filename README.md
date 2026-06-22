@@ -33,6 +33,16 @@ ROC-AUC é quase idêntico nos três modelos (~0.842–0.845) — o sinal vem da
 
 ---
 
+## Interface
+
+<p align="center">
+  <img src="docs/screenshot-frontend.png" alt="RetentIA Frontend" width="100%">
+</p>
+
+🔗 **Live:** [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer)
+
+---
+
 ## Quickstart
 
 ```bash
