@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetentIA — Predição de Churn</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg: #071427; --card: #0e1d35; --card2: #132542; --border: #1b315a;
+  --cyan: #00d4ff; --purple: #8b5cf6; --pink: #ff4d8d; --green: #10b981;
+  --muted: #94a3b8; --text: #f8fafc;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background: radial-gradient(circle at top, rgba(0,212,255,.07), transparent 40%), var(--bg); color: var(--text); min-height: 100vh; }
+
+.container { display: grid; grid-template-columns: 240px 1fr 420px; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { background: #081526; border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; }
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; padding: 0 8px; }
+.logo-icon { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, var(--purple), var(--cyan)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: white; box-shadow: 0 0 20px rgba(0,212,255,.2); }
+.logo h1 { font-size: 22px; font-weight: 700; }
+.logo span { color: var(--cyan); }
+.menu { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.menu a { text-decoration: none; color: var(--muted); padding: 12px 14px; border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: .2s; cursor: pointer; }
+.menu a:hover { background: rgba(139,92,246,.1); color: var(--text); }
+.menu a.active { background: linear-gradient(90deg, rgba(139,92,246,.25), rgba(0,212,255,.1)); border: 1px solid rgba(139,92,246,.3); color: var(--text); }
+.sidebar-footer { border-top: 1px solid var(--border); padding-top: 16px; font-size: 12px; color: var(--muted); display: grid; gap: 6px; }
+.sf-row { display: flex; justify-content: space-between; }
+.sf-val { color: var(--text); font-weight: 600; }
+.online { color: var(--green); }
+
+/* MAIN */
+.content { padding: 32px 36px; overflow-y: auto; }
+.page-title { font-size: 28px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.5px; }
+.card { background: rgba(14,29,53,.8); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
+.section { margin-bottom: 28px; }
+.section-title { display: flex; align-items: center; gap: 8px; color: var(--cyan); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,.15); }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 12px; }
+label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+select, input[type=number] {
+  width: 100%; background: #0d1e38; border: 1px solid #1e3a5f;
+  color: var(--text); border-radius: 10px; padding: 10px 12px; font-size: 13px;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+  appearance: none; -webkit-appearance: none;
+}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2364748b' d='M5 7L0 2h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 26px; }
+select:focus, input[type=number]:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,212,255,.1); }
+.predict-btn {
+  width: 100%; margin-top: 8px; padding: 16px; border: none; border-radius: 12px;
+  color: white; font-size: 16px; font-weight: 700; letter-spacing: .02em;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+  cursor: pointer; transition: opacity .2s, transform .1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.predict-btn:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
+.predict-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.error-msg { margin-top: 12px; padding: 12px 16px; background: rgba(127,29,29,.3); border: 1px solid #7f1d1d; border-radius: 10px; color: #fca5a5; font-size: 13px; display: none; }
+
+/* RESULT */
+.result { padding: 32px 24px; overflow-y: auto; }
+.result-card { background: rgba(14,29,53,.9); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
+.result-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 20px; }
+
+.gauge-wrap { text-align: center; margin-bottom: 4px; }
+.gauge-sub { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+
+.verdict { padding: 16px; border-radius: 14px; text-align: center; margin-bottom: 20px; display: none; }
+.verdict-icon { font-size: 26px; }
+.verdict-title { font-size: 16px; font-weight: 800; margin-top: 6px; letter-spacing: -.3px; }
+.verdict-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.metric { background: #0d1e38; border: 1px solid #1e3a5f; border-radius: 12px; padding: 14px; }
+.metric-icon { font-size: 14px; margin-bottom: 6px; }
+.metric-title { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.metric-value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+
+.interp { background: #0d1e38; border: 1px solid #1e3a5f; border-radius: 12px; padding: 16px; display: none; }
+.interp-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.factor { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 5px 0; color: #cbd5e1; }
+.factor-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.placeholder { text-align: center; padding: 48px 16px; color: var(--muted); }
+.placeholder i { font-size: 48px; opacity: .2; margin-bottom: 12px; display: block; }
+.placeholder p { font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">R</div>
+      <h1>Retent<span>IA</span></h1>
+    </div>
+    <nav class="menu">
+      <a class="active"><i class="fa fa-chart-line fa-fw"></i> Nova Predição</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/docs','_blank')"><i class="fa fa-code fa-fw"></i> Documentação da API</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/metrics','_blank')"><i class="fa fa-gauge fa-fw"></i> Métricas</a>
+      <a onclick="window.open('https://github.com/vdfs89/RetentIA','_blank')"><i class="fa-brands fa-github fa-fw"></i> GitHub</a>
+      <a onclick="window.open('http://retentia.vitorsilva.engineer/health','_blank')"><i class="fa fa-heart-pulse fa-fw"></i> Saúde da API</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sf-row"><span>Status da API</span><span class="sf-val online" id="api-status">● Verificando...</span></div>
+      <div class="sf-row"><span>Versão</span><span class="sf-val">v1.0.0</span></div>
+      <div class="sf-row"><span>Ambiente</span><span class="sf-val">Produção</span></div>
+      <div class="sf-row"><span>Modelo</span><span class="sf-val">MLP • v1.0</span></div>
+      <div style="margin-top:8px;font-size:11px;color:#334155;">RetentIA 2025 · Inteligência que retém.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN FORM -->
+  <main class="content">
+    <h2 class="page-title">Nova Predição</h2>
+    <div class="card">
+
+      <div class="section">
+        <div class="section-title"><i class="fa fa-user"></i> Perfil</div>
+        <div class="fields">
+          <div><label>Gênero</label><select id="gender"><option value="Female">Feminino</option><option value="Male">Masculino</option></select></div>
+          <div><label>Idoso</label><select id="SeniorCitizen"><option value="0">Não</option><option value="1">Sim</option></select></div>
+          <div><label>Possui Parceiro</label><select id="Partner"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Possui Dependentes</label><select id="Dependents"><option value="No">Não</option><option value="Yes">Sim</option></select></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fa fa-file-contract"></i> Contrato</div>
+        <div class="fields">
+          <div><label>Tipo de Contrato</label><select id="Contract"><option value="Month-to-month">Mensal</option><option value="One year">Anual (1 ano)</option><option value="Two year">Bienal (2 anos)</option></select></div>
+          <div><label>Fatura Digital</label><select id="PaperlessBilling"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Forma de Pagamento</label><select id="PaymentMethod"><option value="Electronic check">Cheque eletrônico</option><option value="Mailed check">Cheque postal</option><option value="Bank transfer (automatic)">Transferência bancária (auto)</option><option value="Credit card (automatic)">Cartão de crédito (auto)</option></select></div>
+          <div><label>Tempo de Contrato (meses)</label><input type="number" id="tenure" value="12" min="0" max="100"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fa fa-wifi"></i> Serviços</div>
+        <div class="fields">
+          <div><label>Telefone</label><select id="PhoneService"><option value="Yes">Sim</option><option value="No">Não</option></select></div>
+          <div><label>Múltiplas Linhas</label><select id="MultipleLines"><option value="No">Não</option><option value="Yes">Sim</option><option value="No phone service">Sem telefone</option></select></div>
+          <div><label>Internet</label><select id="InternetService"><option value="Fiber optic">Fibra Óptica</option><option value="DSL">DSL</option><option value="No">Não</option></select></div>
+          <div><label>Segurança Online</label><select id="OnlineSecurity"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Backup Online</label><select id="OnlineBackup"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Proteção de Dispositivo</label><select id="DeviceProtection"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Suporte Técnico</label><select id="TechSupport"><option value="No">Não</option><option value="Yes">Sim</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Streaming TV</label><select id="StreamingTV"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+          <div><label>Streaming Filmes</label><select id="StreamingMovies"><option value="Yes">Sim</option><option value="No">Não</option><option value="No internet service">Sem internet</option></select></div>
+        </div>
+      </div>
+
+      <div class="section" style="margin-bottom:8px">
+        <div class="section-title"><i class="fa fa-dollar-sign"></i> Cobrança</div>
+        <div class="fields" style="grid-template-columns:1fr 1fr">
+          <div><label>Cobrança Mensal (R$)</label><input type="number" id="MonthlyCharges" value="70.35" step="0.01" min="0"></div>
+          <div><label>Cobrança Total (R$)</label><input type="number" id="TotalCharges" value="845.5" step="0.01" min="0"></div>
+        </div>
+      </div>
+
+      <button class="predict-btn" id="btn" onclick="predict()">
+        <i class="fa fa-bolt"></i>
+        <span id="btn-text">Calcular Probabilidade de Churn</span>
+      </button>
+      <div class="error-msg" id="error"></div>
+    </div>
+  </main>
+
+  <!-- RESULT PANEL -->
+  <aside class="result">
+    <div class="result-card">
+      <div class="result-title">Resultado da Predição</div>
+
+      <div id="placeholder" class="placeholder">
+        <i class="fa fa-chart-pie"></i>
+        <p>Preencha os dados e clique em<br>Calcular para ver o resultado.</p>
+      </div>
+
+      <div id="result-body" style="display:none">
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 200 115" style="width:100%">
+            <defs>
+              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#10b981"/>
+                <stop offset="50%" style="stop-color:#f59e0b"/>
+                <stop offset="100%" style="stop-color:#ef4444"/>
+              </linearGradient>
+            </defs>
+            <path d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="#1b315a" stroke-width="18" stroke-linecap="round"/>
+            <path id="gauge-arc" d="M 20 105 A 80 80 0 0 1 180 105" fill="none" stroke="url(#g1)" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 251" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
+            <text id="gauge-text" x="100" y="98" text-anchor="middle" fill="white" font-size="32" font-weight="800">–</text>
+          </svg>
+        </div>
+        <div class="gauge-sub" id="gauge-sub">probabilidade de cancelamento</div>
+
+        <div class="verdict" id="verdict">
+          <div class="verdict-icon" id="v-icon"></div>
+          <div class="verdict-title" id="v-title"></div>
+          <div class="verdict-sub" id="v-sub"></div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-icon" style="color:var(--cyan)">◎</div>
+            <div class="metric-title">Probabilidade</div>
+            <div class="metric-value" id="d-prob">–</div>
+          </div>
+          <div class="metric">
+            <div class="metric-icon" style="color:var(--pink)">✕</div>
+            <div class="metric-title">Decisão</div>
+            <div class="metric-value" id="d-dec">–</div>
+          </div>
+          <div class="metric">
+            <div class="metric-icon" style="color:var(--purple)">⚖</div>
+            <div class="metric-title">Limiar</div>
+            <div class="metric-value">37%</div>
+          </div>
+          <div class="metric">
+            <div class="metric-icon" style="color:var(--cyan)">◈</div>
+            <div class="metric-title">Modelo</div>
+            <div class="metric-value">MLP (v1.0)</div>
+          </div>
+        </div>
+
+        <div class="interp" id="interp">
+          <div class="interp-title"><i class="fa fa-magnifying-glass"></i> Fatores de Risco Identificados</div>
+          <div id="factors"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+const API = "http://retentia.vitorsilva.engineer";
+
+// Health check on load
+fetch(`${API}/health`).then(r => r.json())
+  .then(() => { document.getElementById("api-status").textContent = "● Online"; document.getElementById("api-status").style.color = "#10b981"; })
+  .catch(() => { document.getElementById("api-status").textContent = "● Offline"; document.getElementById("api-status").style.color = "#ef4444"; });
+
+function v(id) { return document.getElementById(id).value; }
+
+// Heuristic risk factors (based on EDA findings)
+function getRiskFactors(payload, isChurn) {
+  const factors = [];
+  if (payload.Contract === "Month-to-month") factors.push({ text: "Contrato mensal (taxa de cancelamento ~42%)", color: "#ef4444" });
+  if (payload.PaymentMethod === "Electronic check") factors.push({ text: "Pagamento via cheque eletrônico (taxa ~45%)", color: "#f59e0b" });
+  if (payload.InternetService === "Fiber optic") factors.push({ text: "Internet: Fibra Óptica (taxa de cancelamento ~42%)", color: "#f59e0b" });
+  if (payload.tenure <= 6) factors.push({ text: `Tempo de contrato: ${payload.tenure} meses (primeiros 6m = alto risco)`, color: "#ef4444" });
+  else if (payload.tenure <= 12) factors.push({ text: `Tempo de contrato: ${payload.tenure} meses`, color: "#f59e0b" });
+  if (payload.OnlineSecurity === "No") factors.push({ text: "Sem segurança online contratada", color: "#94a3b8" });
+  if (payload.TechSupport === "No") factors.push({ text: "Sem suporte técnico contratado", color: "#94a3b8" });
+  if (payload.MonthlyCharges > 70) factors.push({ text: `Cobrança mensal elevada: R$ ${payload.MonthlyCharges}`, color: "#f59e0b" });
+  return factors.slice(0, 5);
+}
+
+async function predict() {
+  const btn = document.getElementById("btn");
+  const errEl = document.getElementById("error");
+  btn.disabled = true;
+  document.getElementById("btn-text").textContent = "Analisando...";
+  errEl.style.display = "none";
+
+  const payload = {
+    gender: v("gender"), SeniorCitizen: parseInt(v("SeniorCitizen")),
+    Partner: v("Partner"), Dependents: v("Dependents"),
+    tenure: parseFloat(v("tenure")), PhoneService: v("PhoneService"),
+    MultipleLines: v("MultipleLines"), InternetService: v("InternetService"),
+    OnlineSecurity: v("OnlineSecurity"), OnlineBackup: v("OnlineBackup"),
+    DeviceProtection: v("DeviceProtection"), TechSupport: v("TechSupport"),
+    StreamingTV: v("StreamingTV"), StreamingMovies: v("StreamingMovies"),
+    Contract: v("Contract"), PaperlessBilling: v("PaperlessBilling"),
+    PaymentMethod: v("PaymentMethod"),
+    MonthlyCharges: parseFloat(v("MonthlyCharges")),
+    TotalCharges: parseFloat(v("TotalCharges")),
+  };
+
+  try {
+    const res = await fetch(`${API}/predict`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`API retornou ${res.status}`);
+    showResult(await res.json(), payload);
+  } catch(e) {
+    errEl.textContent = e.message.includes("fetch")
+      ? "Não foi possível conectar à API. Verifique se está online."
+      : `Erro: ${e.message}`;
+    errEl.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    document.getElementById("btn-text").textContent = "Calcular Probabilidade de Churn";
+  }
+}
+
+function showResult(data, payload) {
+  const prob = Math.round(data.churn_probability * 100);
+  const isChurn = data.churn_prediction;
+  const color = prob > 70 ? "#ef4444" : prob > 40 ? "#f59e0b" : "#10b981";
+
+  document.getElementById("placeholder").style.display = "none";
+  document.getElementById("result-body").style.display = "block";
+
+  // Gauge animation
+  const arc = document.getElementById("gauge-arc");
+  arc.setAttribute("stroke-dasharray", "0 251");
+  setTimeout(() => arc.setAttribute("stroke-dasharray", `${prob * 2.51} 251`), 50);
+  document.getElementById("gauge-text").textContent = `${prob}%`;
+  document.getElementById("gauge-text").setAttribute("fill", color);
+
+  // Verdict
+  const verdict = document.getElementById("verdict");
+  verdict.style.display = "block";
+  verdict.style.background = isChurn ? "rgba(239,68,68,.12)" : "rgba(16,185,129,.12)";
+  verdict.style.border = `1px solid ${isChurn ? "rgba(239,68,68,.35)" : "rgba(16,185,129,.35)"}`;
+  document.getElementById("v-icon").textContent = isChurn ? "⚠️" : "✅";
+  document.getElementById("v-title").textContent = isChurn ? "Alto Risco de Churn" : "Baixo Risco de Churn";
+  document.getElementById("v-title").style.color = isChurn ? "#fca5a5" : "#6ee7b7";
+  document.getElementById("v-sub").textContent = isChurn
+    ? "Recomenda-se ação de retenção imediata."
+    : "Cliente provavelmente permanece ativo.";
+
+  // Metrics
+  document.getElementById("d-prob").textContent = `${prob}%`;
+  document.getElementById("d-prob").style.color = color;
+  document.getElementById("d-dec").textContent = isChurn ? "Cancelamento" : "Retido";
+  document.getElementById("d-dec").style.color = isChurn ? "#fca5a5" : "#6ee7b7";
+
+  // Risk factors
+  const factors = getRiskFactors(payload, isChurn);
+  if (factors.length > 0) {
+    document.getElementById("interp").style.display = "block";
+    document.getElementById("factors").innerHTML = factors.map(f =>
+      `<div class="factor"><div class="factor-dot" style="background:${f.color}"></div>${f.text}</div>`
+    ).join("");
+  }
+}
+</script>
+</body>
+</html>
