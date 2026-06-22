@@ -2,19 +2,27 @@
   <img src="docs/retentia-logo.png" alt="RetentIA" width="120">
 </p>
 
-# RetentIA
+<h1 align="center">RetentIA</h1>
 
-[![CI](https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml/badge.svg)](https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.4-ee4c2c.svg)](https://pytorch.org)
+<p align="center">
+  <a href="https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml"><img src="https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://www.python.org/downloads/release/python-3110/"><img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python 3.11"></a>
+  <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-0.115-009688.svg" alt="FastAPI"></a>
+  <a href="https://pytorch.org"><img src="https://img.shields.io/badge/PyTorch-2.4-ee4c2c.svg" alt="PyTorch"></a>
+</p>
 
-> Predict customer churn before it happens.
+<p align="center">
+  <em>Predict customer churn before it happens.</em>
+</p>
 
-Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de MLOps.
-**FIAP Pós-Tech MLET — Tech Challenge.**
+<p align="center">
+  Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de MLOps.<br>
+  <strong>FIAP Pós-Tech MLET — Tech Challenge.</strong>
+</p>
 
-🔗 **API pública:** [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer/docs)
+<p align="center">
+  🔗 <strong>API pública:</strong> <a href="http://retentia.vitorsilva.engineer/docs">retentia.vitorsilva.engineer</a>
+</p>
 
 ---
 
