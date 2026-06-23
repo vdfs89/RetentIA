@@ -1,0 +1,31 @@
+feature,importance
+Contract=Two year,0.37187853
+Contract=One year,0.16940902
+InternetService=Fiber optic,0.15000981
+InternetService=No,0.059737004
+StreamingMovies=Yes,0.037362594
+tenure,0.023459924
+PaymentMethod=Electronic check,0.020568421
+OnlineSecurity=Yes,0.020188656
+StreamingTV=Yes,0.01865336
+PhoneService=Yes,0.012963188
+OnlineBackup=Yes,0.011922532
+PaperlessBilling=Yes,0.011729643
+TechSupport=Yes,0.0114203775
+MultipleLines=Yes,0.010632138
+TotalCharges,0.010001858
+MonthlyCharges,0.009961418
+Dependents=Yes,0.009461705
+PaymentMethod=Mailed check,0.008024613
+PaymentMethod=Credit card (automatic),0.007989213
+gender=Male,0.0067857406
+Partner=Yes,0.0064458884
+SeniorCitizen=1,0.0058543426
+DeviceProtection=Yes,0.005539948
+MultipleLines=No phone service,0.0
+OnlineSecurity=No internet service,0.0
+DeviceProtection=No internet service,0.0
+StreamingTV=No internet service,0.0
+TechSupport=No internet service,0.0
+OnlineBackup=No internet service,0.0
+StreamingMovies=No internet service,0.0

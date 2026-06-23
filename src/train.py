@@ -105,6 +105,10 @@ def train_pipeline():
         for k, v in xgb_metrics.items():
             mlflow.log_metric(f"xgb_{k}", v)
 
+        with open("models/xgboost.pkl", "wb") as f:
+            pickle.dump(xgb, f)
+        mlflow.log_artifact("models/xgboost.pkl", artifact_path="xgboost")
+
         # 4. PyTorch MLP
         input_dim = X_train.shape[1]
         model = ChurnMLP(input_dim)

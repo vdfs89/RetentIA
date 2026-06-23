@@ -46,7 +46,40 @@ apples-to-apples. Applying the same cost-optimized threshold to XGBoost would al
 recall higher. The key contribution is the **cost-sensitive threshold framework**, not
 architectural superiority.
 
-## 5. Cost Analysis FP vs FN
+## 5. Feature Importance
+
+Ranking das features mais influentes segundo o ganho (*gain*) do XGBoost. Como os três modelos têm ROC-AUC quase idêntico (~0.842–0.845), este ranking aproxima quais sinais dirigem a predição em todos eles. Gerado por [`scripts/feature_importance.py`](../scripts/feature_importance.py); ranking completo em [`docs/feature_importance.csv`](feature_importance.csv).
+
+| #  | Feature                          | Importance |
+|----|----------------------------------|-----------|
+| 1  | `Contract=Two year`              | 0.3719    |
+| 2  | `Contract=One year`              | 0.1694    |
+| 3  | `InternetService=Fiber optic`    | 0.1500    |
+| 4  | `InternetService=No`             | 0.0597    |
+| 5  | `StreamingMovies=Yes`            | 0.0374    |
+| 6  | `tenure`                         | 0.0235    |
+| 7  | `PaymentMethod=Electronic check` | 0.0206    |
+| 8  | `OnlineSecurity=Yes`             | 0.0202    |
+| 9  | `StreamingTV=Yes`                | 0.0187    |
+| 10 | `PhoneService=Yes`               | 0.0130    |
+| 11 | `OnlineBackup=Yes`               | 0.0119    |
+| 12 | `PaperlessBilling=Yes`           | 0.0117    |
+| 13 | `TechSupport=Yes`                | 0.0114    |
+| 14 | `MultipleLines=Yes`              | 0.0106    |
+| 15 | `TotalCharges`                   | 0.0100    |
+
+> Nota: o OneHotEncoder usa `drop="first"`, então a categoria de referência de cada feature não aparece (ex.: `Contract=Month-to-month`, `PaymentMethod=Bank transfer`). A importância dos níveis listados é medida **em relação** a essas referências.
+
+**Leitura de negócio:**
+- O **tipo de contrato domina de forma esmagadora**: `Contract=Two year` + `Contract=One year` somam ~54% do ganho total. Isso captura o efeito do contrato month-to-month (a referência omitida), que no EDA tem churn ~42% — clientes em contratos longos cancelam muito menos.
+- **`InternetService` é o segundo sinal mais forte** (Fibra Óptica + "sem internet" ≈ 21% do ganho), consistente com a maior taxa de churn em fibra óptica observada no EDA.
+- **`tenure` e `PaymentMethod=Electronic check` aparecem como sinais secundários** (não no topo, mas relevantes) — alinhados ao padrão de que tenure baixo e cheque eletrônico concentram cancelamentos.
+- Features de serviço (`OnlineSecurity`, `TechSupport`, `StreamingTV`) entram na cauda do ranking: secundárias, porém presentes — clientes sem esses add-ons cancelam mais.
+- Isso confirma a tese do projeto: **o sinal vem das features de relacionamento e contrato, não da arquitetura do modelo** — coerente com o ROC-AUC quase idêntico entre MLP, XGBoost e LogReg.
+
+**Implicação para retenção:** priorizar clientes em contrato month-to-month, com internet de fibra óptica, tenure baixo e pagamento via electronic check — exatamente o perfil que o frontend sinaliza como alto risco.
+
+## 6. Cost Analysis FP vs FN
 
 | Type | Scenario | Cost |
 |------|----------|------|
@@ -59,7 +92,7 @@ Since C_FN >> C_FP, the optimal threshold falls **below 0.50**, favoring recall 
 - **Threshold derivation:** minimizes total cost on the **validation set** (not test) → `t* = 0.37`
 - **Bayes sanity check:** `t* = C_FP / (C_FP + C_FN) = 100 / 600 ≈ 0.167` — empirical threshold higher due to probability calibration, but direction (< 0.5) is consistent
 
-## 6. Limitations & Known Issues
+## 7. Limitations & Known Issues
 
 - **MLP does not outperform XGBoost** on F1 or PR-AUC at comparable thresholds — documented honestly, not spun. On small tabular datasets (~7k rows), gradient boosting is competitive.
 - **Class imbalance:** handled with `pos_weight` (MLP), `class_weight=balanced` (LogReg), and `scale_pos_weight` (XGBoost).
@@ -68,7 +101,7 @@ Since C_FN >> C_FP, the optimal threshold falls **below 0.50**, favoring recall 
 - **Threshold sensitivity:** optimal threshold depends on the cost ratio. If business costs change, recalculate.
 - **No probability calibration:** raw probabilities are not calibrated. The threshold compensates but true churn likelihoods should be interpreted with caution.
 
-## 7. Governance
+## 8. Governance
 - Fixed seed (42), stratified splits, preprocessor `.fit()` only on train set (anti-leakage).
 - MLflow experiment tracking: params, metrics, and artifacts logged per run (`sqlite:///mlflow.db`).
 - Drift monitoring: each `/predict` call appends input to `logs/input_samples.jsonl`.
