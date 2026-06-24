@@ -26,7 +26,7 @@ Four models trained and compared:
 1. **DummyClassifier** (most_frequent): Baseline — always predicts majority class.
 2. **LogisticRegression** (class_weight=balanced, max_iter=1000): Strong linear baseline.
 3. **XGBClassifier** (n_estimators=200, max_depth=4, lr=0.05, scale_pos_weight=2.73): Gradient boosting baseline.
-4. **MLP** (PyTorch): [32→16→1], BatchNorm + ReLU + Dropout(0.2), BCEWithLogitsLoss with pos_weight=2.73, Adam lr=0.005, batch_size=64, early stopping at epoch 14 (patience=10).
+4. **MLP** (PyTorch): [32→16→1], BatchNorm + ReLU + Dropout(0.2), BCEWithLogitsLoss with pos_weight=2.73, Adam lr=0.005, batch_size=64, early stopping (patience=10, max 100 epochs).
 
 ## Phase 5 — Evaluation
 
@@ -48,4 +48,4 @@ Honest finding: architecture does not drive performance on this dataset — feat
 - **Drift logging:** Each `/predict` call appends input to `logs/input_samples.jsonl`.
 - **Batch:** `scripts/run_batch.py` — vectorized inference without drift log pollution.
 - **CI/CD:** GitHub Actions (lint + test on PR, build Docker on push to main).
-- **Public deploy:** Render free tier (cold start ~50s documented).
+- **Public deploy:** DigitalOcean Droplet (Docker + Nginx reverse proxy) at [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer). See [DEPLOY.md](DEPLOY.md).
