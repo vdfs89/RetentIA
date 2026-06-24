@@ -17,6 +17,22 @@
   <em>Predict customer churn before it happens.</em>
 </p>
 
+## O Problema
+
+Todos os meses, operadoras de telecomunicações perdem clientes. À primeira vista, parece apenas mais um cancelamento. Na prática, é muito mais do que isso.
+
+Quando um cliente abandona a empresa, não se perde apenas a próxima mensalidade. Perde-se toda a receita futura que aquele relacionamento poderia gerar: meses ou anos de pagamentos, oportunidades de upsell, fidelização e crescimento. Em mercados altamente competitivos, cada cliente perdido representa um impacto direto na lucratividade.
+
+O desafio é que o churn raramente acontece sem sinais prévios. Padrões de comportamento, perfil de contratação, forma de pagamento, serviços utilizados e histórico de relacionamento frequentemente indicam uma crescente probabilidade de cancelamento. O problema não está na ausência de dados — está na capacidade de transformar esses sinais em decisões acionáveis no momento certo.
+
+Além disso, o custo do erro não é equilibrado. Classificar incorretamente um cliente que permaneceria na empresa pode gerar apenas o custo de uma campanha de retenção desnecessária. Já deixar de identificar um cliente prestes a cancelar significa perder integralmente seu valor futuro. Em termos de negócio, um falso negativo custa muito mais caro do que um falso positivo.
+
+Foi a partir dessa premissa que nasceu o RetentIA. Em vez de perseguir apenas métricas tradicionais como accuracy, o projeto adota uma abordagem orientada a impacto financeiro. O modelo utiliza uma rede neural MLP treinada sobre o dataset IBM Telco Customer Churn e aplica uma estratégia de decisão baseada em custo, ajustando o threshold de classificação de acordo com a assimetria entre falsos positivos e falsos negativos.
+
+O resultado é uma plataforma de Inteligência Artificial capaz de analisar o perfil de um cliente, estimar sua probabilidade de churn, identificar clientes de alto risco e apoiar estratégias de retenção antes que a perda aconteça.
+
+Mais do que prever cancelamentos, o RetentIA foi desenvolvido para responder à pergunta que realmente importa para o negócio: **em quais clientes vale a pena agir agora para evitar perdas futuras?**
+
 <p align="center">
   Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de MLOps.<br>
   <strong>FIAP Pós-Tech MLET — Tech Challenge.</strong>
