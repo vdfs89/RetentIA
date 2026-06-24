@@ -13,8 +13,8 @@ test:
 	uv run pytest -q
 
 lint:
-	uv run ruff check src/ tests/
-	uv run ruff format --check src/ tests/
+	uv run ruff check .
+	uv run ruff format --check .
 
 run-batch:
 	uv run python scripts/run_batch.py
