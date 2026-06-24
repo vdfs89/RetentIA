@@ -187,7 +187,7 @@ curl -X POST http://retentia.vitorsilva.engineer/predict \
 {
   "churn_probability": 0.8234,
   "churn_prediction": true,
-  "threshold": 0.36
+  "threshold": 0.37
 }
 ```
 
@@ -201,7 +201,7 @@ curl -X POST http://retentia.vitorsilva.engineer/predict \
 | **FP** (falso positivo) | Cliente previsto "cancela" mas fica → oferta de retenção desperdiçada | ≈ custo da campanha (baixo) |
 
 Como C_FN >> C_FP, o threshold ótimo cai **abaixo de 0.50** (favorece recall).
-Threshold: **0.36** — derivado por minimização de custo no conjunto de validação, não arbitrado.
+Threshold: **0.37** — derivado por minimização de custo no conjunto de validação, não arbitrado.
 
 ---
 
