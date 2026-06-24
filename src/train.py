@@ -1,3 +1,4 @@
+import logging
 import os
 import pickle
 
@@ -23,6 +24,8 @@ from src.data.ingest import ingest_data
 from src.features.preprocessor import ChurnPreprocessor
 from src.models.mlp import ChurnMLP
 from src.validation.schemas import get_pandera_schema
+
+logger = logging.getLogger(__name__)
 
 
 def compute_metrics(y_true: np.ndarray, y_preds: np.ndarray, y_probs: np.ndarray | None = None):
@@ -153,7 +156,7 @@ def train_pipeline():
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
-                    print(f"Early stopping at epoch {epoch}")
+                    logger.info("Early stopping at epoch %d", epoch)
                     break
 
         # Load best weights
@@ -193,13 +196,17 @@ def train_pipeline():
             pickle.dump(optimal_t, f)
         mlflow.log_artifact("models/threshold.pkl", artifact_path="threshold")
 
-        print("\n=== Pipeline executed successfully ===")
-        print(f"Optimal threshold (tuned on val): {optimal_t:.2f}")
-        print(f"Dummy    : {dummy_metrics}")
-        print(f"LogReg   : {lr_metrics}")
-        print(f"XGBoost  : {xgb_metrics}")
-        print(f"MLP      : {mlp_metrics}")
+        logger.info("=== Pipeline executed successfully ===")
+        logger.info("Optimal threshold (tuned on val): %.2f", optimal_t)
+        logger.info("Dummy    : %s", dummy_metrics)
+        logger.info("LogReg   : %s", lr_metrics)
+        logger.info("XGBoost  : %s", xgb_metrics)
+        logger.info("MLP      : %s", mlp_metrics)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
     train_pipeline()
