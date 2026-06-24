@@ -141,11 +141,15 @@ Auto-download na primeira execução do `make train` (mirror: [treselle-systems/
 
 Notebook completo em [notebooks/eda.ipynb](notebooks/eda.ipynb). Principais achados:
 
+<div align="center">
+
 | | |
 |---|---|
 | ![Churn Distribution](docs/churn_distribution.png) | ![Numerical Distributions](docs/numerical_distributions.png) |
 | ![Categorical Churn Rates](docs/categorical_churn_rates.png) | ![Correlation Matrix](docs/correlation_matrix.png) |
 | ![Tenure vs Churn](docs/tenure_vs_churn.png) | ![Charges Scatter](docs/charges_scatter.png) |
+
+</div>
 
 ![All Categorical Churn Rates](docs/all_categorical_churn_rates.png)
 
@@ -153,12 +157,16 @@ Notebook completo em [notebooks/eda.ipynb](notebooks/eda.ipynb). Principais acha
 
 ## API
 
+<div align="center">
+
 | Endpoint   | Método | Descrição                             |
 |-----------|--------|---------------------------------------|
 | `/health` | GET    | Liveness check                        |
 | `/metrics`| GET    | Prometheus (counters + latência)      |
 | `/predict`| POST   | Predição de churn (1 cliente, JSON)   |
 | `/docs`   | GET    | Swagger UI interativo                 |
+
+</div>
 
 ### Exemplo de request
 
@@ -192,10 +200,14 @@ curl -X POST http://retentia.vitorsilva.engineer/predict \
 
 ## Análise de Custo FP vs FN
 
+<div align="center">
+
 | Tipo | Cenário | Custo |
 |------|---------|-------|
 | **FN** (falso negativo) | Cliente previsto "fica" mas cancela → sem ação de retenção → cliente perdido | ≈ CLV (alto) |
 | **FP** (falso positivo) | Cliente previsto "cancela" mas fica → oferta de retenção desperdiçada | ≈ custo da campanha (baixo) |
+
+</div>
 
 Como C_FN >> C_FP, o threshold ótimo cai **abaixo de 0.50** (favorece recall).
 Threshold: **0.37** — derivado por minimização de custo no conjunto de validação, não arbitrado.
@@ -224,6 +236,8 @@ retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
 
 ## Documentação
 
+<div align="center">
+
 | Documento | Descrição |
 |-----------|-----------|
 | [MODEL_CARD](docs/MODEL_CARD.md) | Performance, análise de custo, limitações |
@@ -232,9 +246,13 @@ retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
 | [DEPLOY](docs/DEPLOY.md) | Arquitetura de deploy |
 | [MONITORING](docs/MONITORING.md) | Monitoramento de drift e serviço |
 
+</div>
+
 ---
 
 ## Stack
+
+<div align="center">
 
 | Componente | Tecnologia |
 |-----------|-----------|
@@ -249,6 +267,8 @@ retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
 | Testes | Pytest (fixtures isoladas) |
 | CI/CD | GitHub Actions |
 | Deploy | Docker + Nginx + DigitalOcean |
+
+</div>
 
 ---
 
