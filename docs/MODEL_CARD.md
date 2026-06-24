@@ -102,6 +102,8 @@ Since C_FN >> C_FP, the optimal threshold falls **below 0.50**, favoring recall 
 - **No probability calibration:** raw probabilities are not calibrated. The threshold compensates but true churn likelihoods should be interpreted with caution.
 
 ## 8. Governance
-- Fixed seed (42), stratified splits, preprocessor `.fit()` only on train set (anti-leakage).
+- Fixed seed (42) on numpy, torch and the DataLoader generator, stratified splits, preprocessor `.fit()` only on train set (anti-leakage).
 - MLflow experiment tracking: params, metrics, and artifacts logged per run (`sqlite:///mlflow.db`).
 - Drift monitoring: each `/predict` call appends input to `logs/input_samples.jsonl`.
+
+> **Reproducibility note:** the versioned MLP artifacts (`models/mlp_weights.pt`, `models/threshold.pkl = 0.37`) and the reported metrics were produced **before** the PyTorch seeding was added. They are kept as-is so the documented numbers match the deployed model. The seed guarantees deterministic results for **future** retraining runs; reproducing the exact current weights would require the original (unseeded) run.

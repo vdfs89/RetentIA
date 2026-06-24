@@ -42,6 +42,10 @@ def compute_metrics(y_true: np.ndarray, y_preds: np.ndarray, y_probs: np.ndarray
 
 
 def train_pipeline():
+    # Reproducibility: seed numpy and torch so MLP training is deterministic.
+    np.random.seed(42)
+    torch.manual_seed(42)
+
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("RetentIA_Churn_Prediction")
 
@@ -127,7 +131,15 @@ def train_pipeline():
         train_dataset = TensorDataset(
             torch.FloatTensor(X_train), torch.FloatTensor(y_train).unsqueeze(1)
         )
-        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, drop_last=True)
+        loader_generator = torch.Generator()
+        loader_generator.manual_seed(42)
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=64,
+            shuffle=True,
+            drop_last=True,
+            generator=loader_generator,
+        )
 
         X_val_t = torch.FloatTensor(X_val)
         y_val_t = torch.FloatTensor(y_val).unsqueeze(1)
