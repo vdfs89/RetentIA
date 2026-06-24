@@ -1,9 +1,12 @@
 # Deploy Architecture — RetentIA
 
 - **App:** FastAPI + Uvicorn (`src.main:app`).
-- **Artifacts:** `models/preprocessor.pkl`, `models/mlp_weights.pt`, `models/threshold.pkl`.
-- **Release strategy:** `render.yaml` runs `python -m src.train` at build time.
-- **Cold start (free tier):** service sleeps after ~15min; first request ~50s.
+- **Infraestrutura:** DigitalOcean Droplet (8GB RAM). A API roda num container Docker (uvicorn na porta interna `8000`, publicada no host como `8080` via `-p 8080:8000`). O **Nginx nativo** (não containerizado) faz reverse proxy. DNS: `retentia.vitorsilva.engineer` → A record → IP do droplet.
+- **Roteamento (Nginx):**
+  - `/` → frontend estático servido diretamente pelo Nginx de `/var/www/retentia/` (não passa pela API).
+  - `/predict`, `/health`, `/metrics`, `/docs` → `proxy_pass` para o container Docker (`http://127.0.0.1:8080`).
+- **Artefatos:** `models/preprocessor.pkl`, `models/mlp_weights.pt`, `models/threshold.pkl`, `models/xgboost.pkl` são **commitados no repositório**. O modelo **não** é treinado no build do Docker — o `Dockerfile` apenas instala as dependências, copia `src/` + `models/` e sobe o uvicorn.
+- **`render.yaml`:** permanece no repositório como **legado/inativo** — não há deploy no Render; a infra de produção é a descrita acima.
 - **Observability:** `X-Process-Time` header; Prometheus `/metrics`; drift log `logs/input_samples.jsonl`.
 
 ## Autenticação e Segurança (decisão de design)
