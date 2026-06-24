@@ -1,7 +1,11 @@
-.PHONY: install train run test lint clean run-batch
+.PHONY: install lock train run test lint clean run-batch
 
 install:
 	uv pip install --system -r requirements.txt
+
+# Regenerate the pinned requirements.txt lock from pyproject.toml (single source of truth)
+lock:
+	uv pip compile pyproject.toml --extra dev -o requirements.txt
 
 train:
 	uv run python -m src.train

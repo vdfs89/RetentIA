@@ -70,6 +70,7 @@ ROC-AUC é quase idêntico nos três modelos (~0.842–0.845) — o sinal vem da
 ```bash
 # Instalar dependências
 make install                  # ou: uv pip install --system -r requirements.txt
+# (deps são declaradas no pyproject.toml; requirements.txt é o lock gerado via `make lock`)
 
 # Treinar (baixa o dataset automaticamente no primeiro run)
 make train                    # baselines + MLP + threshold por custo → models/
