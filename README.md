@@ -1,10 +1,8 @@
-<div align="center">
-
 <p align="center">
   <img src="docs/retentia-logo.png" alt="RetentIA" width="120">
 </p>
 
-<h1 align="center">RetentIA</h1>
+# RetentIA
 
 <p align="center">
   <a href="https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml"><img src="https://github.com/vdfs89/RetentIA/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -13,9 +11,7 @@
   <a href="https://pytorch.org"><img src="https://img.shields.io/badge/PyTorch-2.4-ee4c2c.svg" alt="PyTorch"></a>
 </p>
 
-<p align="center">
-  <em>Predict customer churn before it happens.</em>
-</p>
+> Predict customer churn before it happens.
 
 ## O Problema
 
@@ -33,18 +29,16 @@ O resultado é uma plataforma de Inteligência Artificial capaz de analisar o pe
 
 Mais do que prever cancelamentos, o RetentIA foi desenvolvido para responder à pergunta que realmente importa para o negócio: **em quais clientes vale a pena agir agora para evitar perdas futuras?**
 
-<p align="center">
-  Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de MLOps.<br>
-  <strong>FIAP Pós-Tech MLET — Tech Challenge.</strong>
-</p>
+Projeto de predição de churn com MLP (PyTorch), FastAPI, MLflow e práticas de MLOps.
+**FIAP Pós-Tech MLET — Tech Challenge.**
 
-<p align="center">
-  🔗 <strong>API pública:</strong> <a href="http://retentia.vitorsilva.engineer/docs">retentia.vitorsilva.engineer</a>
-</p>
+🔗 **API pública:** [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer/docs)
 
 ---
 
 ## Resultados
+
+<div align="center">
 
 | Modelo         | Accuracy | Precision | Recall   | F1     | ROC-AUC | PR-AUC |
 |----------------|----------|-----------|----------|--------|---------|--------|
@@ -52,6 +46,8 @@ Mais do que prever cancelamentos, o RetentIA foi desenvolvido para responder à 
 | LogReg @0.5    | 0.7381   | 0.5043    | 0.7807   | 0.6128 | 0.8429  | 0.6340 |
 | XGBoost @0.5   | 0.7480   | 0.5167    | 0.7861   | **0.6236** | 0.8420 | **0.6534** |
 | **MLP @0.37**  | 0.6828   | 0.4510    | **0.8984** | 0.6005 | **0.8453** | 0.6372 |
+
+</div>
 
 **Cost-optimized threshold: 0.37** (tuned on validation set, C_FN=500, C_FP=100).
 
@@ -258,5 +254,3 @@ retentia.vitorsilva.engineer/docs       → FastAPI Swagger UI
 ## Licença
 
 MIT
-
-</div>
