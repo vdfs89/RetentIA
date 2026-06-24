@@ -107,3 +107,18 @@ Since C_FN >> C_FP, the optimal threshold falls **below 0.50**, favoring recall 
 - Drift monitoring: each `/predict` call appends input to `logs/input_samples.jsonl`.
 
 > **Reproducibility note:** the versioned MLP artifacts (`models/mlp_weights.pt`, `models/threshold.pkl = 0.37`) and the reported metrics were produced **before** the PyTorch seeding was added. They are kept as-is so the documented numbers match the deployed model. The seed guarantees deterministic results for **future** retraining runs; reproducing the exact current weights would require the original (unseeded) run.
+
+## 9. Fairness & Bias
+
+The dataset includes **protected/sensitive attributes** used as model features: `gender`, `SeniorCitizen`, `Partner`, `Dependents`. This raises fairness considerations that must be addressed before any real-world deployment.
+
+**Known gap (not yet audited):** no subgroup fairness analysis has been performed. The reported metrics are aggregate only — there is **no** measurement of recall/precision per demographic subgroup (e.g., recall for senior vs. non-senior, or by gender), nor any fairness criterion (equalized odds, demographic parity) validated.
+
+**Mitigating evidence (partial, not a substitute for an audit):** the [feature importance](#5-feature-importance) ranking shows the signal is dominated by `Contract`, `InternetService` and `tenure` — relationship/contract features — while the demographic attributes do **not** appear in the top ranks. This suggests the model does not lean heavily on protected attributes, but it does not prove the absence of disparate impact.
+
+**Recommended next steps for production:**
+- Measure per-subgroup performance (recall, precision, cost) across `gender` and `SeniorCitizen`.
+- Evaluate dropping protected attributes from the feature set, or applying fairness constraints / post-processing.
+- Verify the retention queue does not systematically over- or under-target any protected group.
+
+**Ethical/regulatory note:** using `gender` or age (`SeniorCitizen`) to decide who receives retention offers may carry legal and ethical implications depending on jurisdiction. In a production setting this should be reviewed with compliance before launch.
