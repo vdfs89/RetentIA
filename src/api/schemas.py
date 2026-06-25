@@ -34,3 +34,16 @@ class PredictionResponse(BaseModel):
     churn_probability: float
     churn_prediction: bool
     threshold: float
+
+
+class BatchPredictRequest(BaseModel):
+    """Lista de clientes para predição em lote."""
+
+    samples: list[CustomerFeatures] = Field(..., min_length=1, max_length=1000)
+
+
+class BatchPredictResponse(BaseModel):
+    """Resposta do batch: predições na mesma ordem da entrada."""
+
+    predictions: list[PredictionResponse]
+    count: int

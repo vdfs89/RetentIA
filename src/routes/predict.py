@@ -2,8 +2,13 @@ import logging
 
 from fastapi import APIRouter, HTTPException
 
-from src.api.schemas import CustomerFeatures, PredictionResponse
-from src.services.model_service import predict_one
+from src.api.schemas import (
+    BatchPredictRequest,
+    BatchPredictResponse,
+    CustomerFeatures,
+    PredictionResponse,
+)
+from src.services.model_service import predict_batch, predict_one
 
 logger = logging.getLogger("retentia")
 
@@ -25,3 +30,17 @@ def predict(features: CustomerFeatures):
     except Exception as e:
         logger.exception("Prediction failed")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/predict/batch", response_model=BatchPredictResponse)
+def predict_batch_endpoint(request: BatchPredictRequest):
+    try:
+        samples = [s.model_dump() for s in request.samples]
+        results = predict_batch(samples)
+        return BatchPredictResponse(
+            predictions=[PredictionResponse(**r) for r in results],
+            count=len(results),
+        )
+    except Exception as e:
+        logger.exception("Batch prediction failed")
+        raise HTTPException(status_code=500, detail="Batch prediction error") from e

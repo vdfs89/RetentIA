@@ -121,3 +121,36 @@ def test_predict_invalid_category_422():
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 422
+
+
+def test_predict_batch():
+    client = TestClient(app)
+    sample = {
+        "gender": "Female",
+        "SeniorCitizen": 0,
+        "Partner": "Yes",
+        "Dependents": "No",
+        "tenure": 12,
+        "PhoneService": "Yes",
+        "MultipleLines": "No",
+        "InternetService": "Fiber optic",
+        "OnlineSecurity": "No",
+        "OnlineBackup": "Yes",
+        "DeviceProtection": "No",
+        "TechSupport": "No",
+        "StreamingTV": "Yes",
+        "StreamingMovies": "Yes",
+        "Contract": "Month-to-month",
+        "PaperlessBilling": "Yes",
+        "PaymentMethod": "Electronic check",
+        "MonthlyCharges": 70.35,
+        "TotalCharges": 845.5,
+    }
+    response = client.post("/predict/batch", json={"samples": [sample, sample]})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 2
+    assert len(data["predictions"]) == 2
+    for pred in data["predictions"]:
+        assert "churn_probability" in pred
+        assert "churn_prediction" in pred

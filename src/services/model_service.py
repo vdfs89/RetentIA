@@ -96,3 +96,18 @@ def predict_one(features_dict: dict, log_to_file: bool = True) -> tuple:
         log_input_sample(features_dict, prob, bool(pred))
 
     return prob, bool(pred), _threshold
+
+
+def predict_batch(samples: list[dict], log_to_file: bool = True) -> list[dict]:
+    """Roda predição para múltiplos clientes, reutilizando predict_one."""
+    results = []
+    for sample in samples:
+        prob, pred, threshold = predict_one(sample, log_to_file=log_to_file)
+        results.append(
+            {
+                "churn_probability": prob,
+                "churn_prediction": pred,
+                "threshold": threshold,
+            }
+        )
+    return results
