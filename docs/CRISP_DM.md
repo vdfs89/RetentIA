@@ -49,3 +49,4 @@ Honest finding: architecture does not drive performance on this dataset — feat
 - **Batch:** `scripts/run_batch.py` — vectorized inference without drift log pollution.
 - **CI/CD:** GitHub Actions (lint + test on PR, build Docker on push to main).
 - **Public deploy:** DigitalOcean Droplet (Docker + Nginx reverse proxy) at [retentia.vitorsilva.engineer](http://retentia.vitorsilva.engineer). See [DEPLOY.md](DEPLOY.md).
+- **Frontend:** UI estática em PT-BR servida pelo Nginx na raiz — gauge animado, sidebar de navegação, fatores de risco por heurística do EDA.
