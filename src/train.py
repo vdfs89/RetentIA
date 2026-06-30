@@ -42,7 +42,7 @@ def compute_metrics(y_true: np.ndarray, y_preds: np.ndarray, y_probs: np.ndarray
 
 
 def train_pipeline():
-    # Reproducibility: seed numpy and torch so MLP training is deterministic.
+    # Reprodutibilidade: define a seed do numpy e torch para o treino do MLP ser determinístico.
     np.random.seed(42)
     torch.manual_seed(42)
 
@@ -168,10 +168,10 @@ def train_pipeline():
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
-                    logger.info("Early stopping at epoch %d", epoch)
+                    logger.info("Parada antecipada no epoch %d", epoch)
                     break
 
-        # Load best weights
+        # Carrega os melhores pesos
         if best_state is not None:
             model.load_state_dict(best_state)
         torch.save(model.state_dict(), "models/mlp_weights.pt")
@@ -208,8 +208,8 @@ def train_pipeline():
             pickle.dump(optimal_t, f)
         mlflow.log_artifact("models/threshold.pkl", artifact_path="threshold")
 
-        logger.info("=== Pipeline executed successfully ===")
-        logger.info("Optimal threshold (tuned on val): %.2f", optimal_t)
+        logger.info("=== Pipeline executado com sucesso ===")
+        logger.info("Threshold ótimo (ajustado na validação): %.2f", optimal_t)
         logger.info("Dummy    : %s", dummy_metrics)
         logger.info("LogReg   : %s", lr_metrics)
         logger.info("XGBoost  : %s", xgb_metrics)

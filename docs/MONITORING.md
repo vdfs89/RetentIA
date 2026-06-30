@@ -1,21 +1,21 @@
-# Monitoring Playbook — RetentIA
+# Manual de Monitoramento — RetentIA
 
-## Service Health
-- `/health` → liveness check.
-- `/metrics` → Prometheus counters and latency histogram.
-- Latency header `X-Process-Time` per request.
+## Saúde do Serviço
+- `/health` → verificação de atividade (liveness check).
+- `/metrics` → contadores e histograma de latência para o Prometheus.
+- Header de latência `X-Process-Time` por requisição.
 
-## Model Quality
-- **Data drift:** monitor distribution of `tenure`, `MonthlyCharges`, `Contract`, `PaymentMethod` vs training baseline.
-- **Prediction drift:** score distribution and positive rate at threshold.
-- **Performance:** when actual churn arrives, recalculate recall/precision/cost.
+## Qualidade do Modelo
+- **Drift de dados:** monitorar a distribuição de `tenure`, `MonthlyCharges`, `Contract`, `PaymentMethod` vs. a linha de base do treinamento.
+- **Drift de predição:** distribuição das pontuações e taxa de positivos no limiar.
+- **Desempenho:** quando os dados reais de churn chegarem, recalcular recall/precisão/custo.
 
-## Retraining Triggers
-- Significant drift, recall drop, or change in cost assumptions (CLV/offer cost).
+## Gatilhos para Retreinamento
+- Drift significativo, queda no recall ou mudança nas premissas de custo (CLV/custo da oferta).
 
-## Drift Sampling
-- Each `/predict` appends to `logs/input_samples.jsonl` (input for Evidently/NannyML).
-- Batch inference (`scripts/run_batch.py`) does NOT log to drift file (avoids pollution).
+## Amostragem para Drift
+- Cada chamada a `/predict` anexa dados a `logs/input_samples.jsonl` (entrada para Evidently/NannyML).
+- A inferência em lote (`scripts/run_batch.py`) NÃO registra no arquivo de drift (evita poluição).
 
 ## Evolução: Observabilidade Avançada
 

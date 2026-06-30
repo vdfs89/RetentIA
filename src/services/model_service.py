@@ -9,7 +9,7 @@ import torch
 from src.features.preprocessor import ChurnPreprocessor
 from src.models.mlp import ChurnMLP
 
-# Configurable paths to allow test sandboxing via monkeypatch
+# Caminhos configuráveis para permitir sandboxing de teste via monkeypatch
 preprocessor_path = "models/preprocessor.pkl"
 weights_path = "models/mlp_weights.pt"
 threshold_path = "models/threshold.pkl"
@@ -26,7 +26,7 @@ def load_model():
         return
 
     if not os.path.exists(preprocessor_path) or not os.path.exists(weights_path):
-        raise FileNotFoundError("Model files not found. Run training first.")
+        raise FileNotFoundError("Arquivos do modelo não encontrados. Execute o treinamento primeiro.")
 
     _preprocessor = ChurnPreprocessor.load(preprocessor_path)
 

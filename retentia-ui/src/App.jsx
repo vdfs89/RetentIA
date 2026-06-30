@@ -13,15 +13,15 @@ const DEFAULTS = {
 
 const FIELDS = [
   { group: "Perfil", fields: [
-    { key: "gender", label: "Gênero", type: "select", options: ["Female", "Male"] },
+    { key: "gender", label: "Gênero", type: "select", options: ["Female", "Male"], labels: ["Feminino", "Masculino"] },
     { key: "SeniorCitizen", label: "Idoso", type: "select", options: [0, 1], labels: ["Não", "Sim"] },
     { key: "Partner", label: "Parceiro(a)", type: "select", options: ["Yes", "No"], labels: ["Sim", "Não"] },
     { key: "Dependents", label: "Dependentes", type: "select", options: ["Yes", "No"], labels: ["Sim", "Não"] },
   ]},
   { group: "Contrato", fields: [
-    { key: "Contract", label: "Tipo de Contrato", type: "select", options: ["Month-to-month", "One year", "Two year"] },
+    { key: "Contract", label: "Tipo de Contrato", type: "select", options: ["Month-to-month", "One year", "Two year"], labels: ["Mês a mês", "Um ano", "Dois anos"] },
     { key: "PaperlessBilling", label: "Fatura Digital", type: "select", options: ["Yes", "No"], labels: ["Sim", "Não"] },
-    { key: "PaymentMethod", label: "Pagamento", type: "select", options: ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"] },
+    { key: "PaymentMethod", label: "Pagamento", type: "select", options: ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"], labels: ["Cheque eletrônico", "Cheque pelos correios", "Transferência bancária (automática)", "Cartão de crédito (automático)"] },
     { key: "tenure", label: "Tempo de Contrato (meses)", type: "number", min: 0, max: 100 },
   ]},
   { group: "Serviços", fields: [
@@ -141,7 +141,7 @@ export default function App() {
                   {isChurn ? "Recomenda-se ação de retenção" : "Cliente provavelmente permanece"}
                 </div>
               </div>
-              {[["Probabilidade", `${prob}%`], ["Threshold", "36% (custo-ótimo)"], ["Decisão", isChurn ? "Churn" : "Retido"]].map(([k, v]) => (
+              {[["Probabilidade", `${prob}%`], ["Limite de Decisão", "36% (custo-ótimo)"], ["Decisão", isChurn ? "Churn" : "Retido"]].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
                   <span style={{ color: "#64748b" }}>{k}</span>
                   <span style={{ color: "#f8fafc", fontWeight: 500 }}>{v}</span>

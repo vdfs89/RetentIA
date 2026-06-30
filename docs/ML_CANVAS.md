@@ -1,45 +1,45 @@
 # ML Canvas — RetentIA
 
-## 1. Value Proposition
-Reduce recurring revenue loss by anticipating which customers tend to cancel, enabling proactive retention before churn occurs.
+## 1. Proposta de Valor
+Reduzir a perda de receita recorrente antecipando quais clientes tendem a cancelar, permitindo a retenção proativa antes que o churn ocorra.
 
-## 2. Stakeholders
-- **Retention/CRM team:** Consumes churn scores to prioritize outreach.
-- **Finance:** Validates CLV assumptions and campaign ROI.
-- **Data/ML team:** Maintains and retrains the model.
+## 2. Partes Interessadas (Stakeholders)
+- **Equipe de Retenção/CRM:** Consome as pontuações de churn para priorizar o contato.
+- **Financeiro:** Valida as premissas de CLV e o ROI da campanha.
+- **Equipe de Dados/ML:** Mantém e retreina o modelo.
 
-## 3. Prediction Task
-Binary classification: `P(churn)` per customer, from 19 profile, contract, and billing features. Output: probability + binary decision at cost-optimized threshold.
+## 3. Tarefa de Predição
+Classificação binária: `P(churn)` por cliente, a partir de 19 features de perfil, contrato e faturamento. Saída: probabilidade + decisão binária em um limiar otimizado por custo.
 
-## 4. Data Sources
-IBM Telco Customer Churn dataset (~7,043 customers) as proxy for real telco CRM data. Auto-downloaded from GitHub mirror on first run.
+## 4. Fontes de Dados
+Conjunto de dados IBM Telco Customer Churn (~7.043 clientes) como um proxy para dados reais de CRM de telecomunicações. Baixado automaticamente de um espelho do GitHub na primeira execução.
 
 ## 5. Features
-- **Contract:** `Contract` (month-to-month, one year, two year), `PaymentMethod`, `PaperlessBilling`
-- **Services:** `InternetService`, `PhoneService`, add-ons (OnlineSecurity, TechSupport, Streaming, etc.)
-- **Usage/tenure:** `tenure` (months as customer)
-- **Billing:** `MonthlyCharges`, `TotalCharges`
-- **Demographics:** `gender`, `SeniorCitizen`, `Partner`, `Dependents`
+- **Contrato:** `Contract` (mês a mês, um ano, dois anos), `PaymentMethod`, `PaperlessBilling`
+- **Serviços:** `InternetService`, `PhoneService`, adicionais (OnlineSecurity, TechSupport, Streaming, etc.)
+- **Uso/Tempo de Contrato:** `tenure` (meses como cliente)
+- **Faturamento:** `MonthlyCharges`, `TotalCharges`
+- **Demografia:** `gender`, `SeniorCitizen`, `Partner`, `Dependents`
 
-## 6. Business Metric
-Retained revenue vs. campaign cost (ROI of retention actions). API latency SLO: p95 < 500ms.
+## 6. Métrica de Negócio
+Receita retida vs. custo da campanha (ROI das ações de retenção). SLO de latência da API: p95 < 500ms.
 
-## 7. Technical Metrics (from test set)
-- **MLP @0.37 threshold:** Accuracy 0.6828, Precision 0.4510, Recall 0.8984, F1 0.6005
-- **LogReg @0.5 baseline:** Accuracy 0.7381, Precision 0.5043, Recall 0.7807, F1 0.6128
-- **Cost assumptions:** C_FN=500 (lost customer ≈ CLV), C_FP=100 (wasted retention offer)
+## 7. Métricas Técnicas (do conjunto de teste)
+- **Limiar MLP @0.37:** Acurácia 0.6828, Precisão 0.4510, Recall 0.8984, F1 0.6005
+- **Linha de base LogReg @0.5:** Acurácia 0.7381, Precisão 0.5043, Recall 0.7807, F1 0.6128
+- **Premissas de custo:** C_FN=500 (cliente perdido ≈ CLV), C_FP=100 (oferta de retenção desperdiçada)
 
-## 8. Decision
-Score above threshold (0.37) → customer enters retention queue for human review (offer, call, discount). Threshold derived from cost minimization on validation set, not fixed at 0.5.
+## 8. Decisão
+Pontuação acima do limiar (0.37) → cliente entra na fila de retenção para revisão humana (oferta, ligação, desconto). Limiar derivado da minimização de custos no conjunto de validação, não fixo em 0.5.
 
-## 9. Serving
-- **Online:** FastAPI `/predict` (sync, 1 customer per request).
-- **Batch:** `scripts/run_batch.py` (vectorized, full dataset).
+## 9. Servindo o Modelo (Serving)
+- **Online:** FastAPI `/predict` (síncrono, 1 cliente por requisição).
+- **Em Lote (Batch):** `scripts/run_batch.py` (vetorizado, conjunto de dados completo).
 
-## 10. Retraining
-Periodic retrain when observed churn data becomes available. Triggers: significant feature drift, recall degradation, or changed cost assumptions.
+## 10. Retreinamento
+Retreinamento periódico quando dados de churn observados se tornam disponíveis. Gatilhos: desvio significativo das features, degradação do recall ou mudança nas premissas de custo.
 
-## 11. Monitoring
-- **Service:** `/health`, `/metrics` (Prometheus), `X-Process-Time` header.
-- **Drift:** `logs/input_samples.jsonl` for input distribution monitoring (Evidently/NannyML).
-- **Performance:** Recalculate metrics when ground truth (actual churn) is available.
+## 11. Monitoramento
+- **Serviço:** `/health`, `/metrics` (Prometheus), header `X-Process-Time`.
+- **Drift:** `logs/input_samples.jsonl` para monitoramento da distribuição de entrada (Evidently/NannyML).
+- **Desempenho:** Recalcular métricas quando a verdade fundamental (churn real) estiver disponível.

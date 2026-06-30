@@ -16,11 +16,11 @@ logger = logging.getLogger("retentia")
 
 LATENCY = Histogram(
     "api_request_latency_seconds",
-    "Latency of requests in seconds",
+    "Latência das requisições em segundos",
     ["endpoint"],
 )
 
-app = FastAPI(title="RetentIA API", description="FastAPI Churn Prediction Service")
+app = FastAPI(title="RetentIA API", description="Serviço de Predição de Churn com FastAPI")
 
 app.add_middleware(
     CORSMiddleware,
