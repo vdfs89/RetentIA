@@ -26,7 +26,9 @@ def load_model():
         return
 
     if not os.path.exists(preprocessor_path) or not os.path.exists(weights_path):
-        raise FileNotFoundError("Arquivos do modelo não encontrados. Execute o treinamento primeiro.")
+        raise FileNotFoundError(
+            "Arquivos do modelo não encontrados. Execute o treinamento primeiro."
+        )
 
     _preprocessor = ChurnPreprocessor.load(preprocessor_path)
 
